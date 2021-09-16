@@ -36,6 +36,7 @@ const ProductForm = (props) => {
                 }
             })
             .catch(err=>console.log(err))
+        // setLoaded(false);
     }
     
     return (
