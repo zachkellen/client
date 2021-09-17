@@ -18,12 +18,16 @@ export default () => {
             .catch(err=>console.log(err))
     }, [loaded]);
 
+    const removeFromDom = (productId) => {
+        setProducts(products.filter(product => product._id != productId));
+    }
+
     return (
         <div>
             <h2>Product Manager</h2>
             <ProductForm/>
             <hr/>
-            {loaded && <ProductList products={products} />}
+            {loaded && <ProductList products={products} removeFromDom={removeFromDom}/>}
         </div>
     )
 }

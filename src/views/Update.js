@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
 import axios from 'axios';
-import {useHistory} from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import {useParams, useHistory} from 'react-router-dom';
 
-const ProductForm = (props) => {
+const Edit = (props) => {
+    const {id} = useParams();
     const history = useHistory();
-    //keep track of what is being typed via useState hook
+
     const [form, setForm] = useState({
         title: "",
         price: "",
@@ -17,48 +18,49 @@ const ProductForm = (props) => {
             ...form,
             [event.target.name]: event.target.value
         })
-        console.log(form)
     }
 
-    //handler when the form is submitted
-    const onSubmitHandler = e => {
-        //prevent default behavior of the submit
-        e.preventDefault();
-        //make a post request to create a new person
-        axios.post('http://localhost:8000/api/products/new', form)
+    const onSubmitHandler = (event) => {
+        event.preventDefault();
+
+        axios.patch(`http://localhost:8000/api/products/${id}/edit`,form)
             .then(res=>{
                 console.log(res.data);
-                if(res.data.results){
                     history.push('/');
-                }
-                else{
-                    setErrors(res.data.err.errors);
-                }
             })
             .catch(err=>console.log(err))
-        // setLoaded(false);
     }
-    
-    return (
-        <form onSubmit={onSubmitHandler}>
+
+    useEffect(()=>{
+        axios.get("http://localhost:8000/api/products/" + id)
+            .then(res=>{
+                console.log(res.data);
+                setForm(res.data);})
+            .catch(err=>console.log(err));
+    },[id])
+
+    return(
+        <div>
+            <form onSubmit={onSubmitHandler}>
             <p>
                 <label>Title: </label><br/>
-                <input name='title' type="text" onChange={onChangeHandler}/>
+                <input name='title' type="text" value={form.title} onChange={onChangeHandler}/>
                 <span>{errors.title && errors.title.message}</span>
             </p>
             <p>
                 <label>Price: </label><br/>
-                <input name='price' type="number" onChange={onChangeHandler}/>
+                <input name='price' type="number" value={form.price} onChange={onChangeHandler}/>
                 <span>{errors.price && errors.price.message}</span>
             </p>
             <p>
                 <label>Description: </label><br/>
-                <input name='description' type="text" onChange={onChangeHandler}/>
+                <input name='description' type="text" value={form.description} onChange={onChangeHandler}/>
                 <span>{errors.description && errors.description.message}</span>
             </p>
             <input type="submit"/>
         </form>
+        </div>
     )
 }
 
-export default ProductForm;
+export default Edit;
